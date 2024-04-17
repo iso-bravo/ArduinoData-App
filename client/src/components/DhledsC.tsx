@@ -6,7 +6,7 @@ function DhledsC() {
 
     const sendPostRequestAmarillo= async (state: number) => {
         try {
-            const response = await axios.get(`http://192.168.185.26/H?temp=${state}`);
+            const response = await axios.get(`http://192.168.76.26/H?temp=${state}`);
             console.log(response.data);
         } catch (error) {
             console.error('Error al enviar solicitud POST:', error);
@@ -15,7 +15,7 @@ function DhledsC() {
 
     const sendPostRequestVerde = async (state: number) => {
         try {
-            const response = await axios.post(`http://192.168.185.26/H?hum=${state}`);
+            const response = await axios.post(`http://192.168.76.26/H?hum=${state}`);
             console.log(response.data);
         } catch (error) {
             console.error('Error al enviar solicitud POST:', error);
@@ -24,7 +24,7 @@ function DhledsC() {
 
     const sendPostRequestRojo = async (state: number) => {
         try {
-            const response = await axios.post(`http://192.168.185.26/B?val=${state}`);
+            const response = await axios.post(`http://192.168.76.26/B?val=${state}`);
             console.log(response.data);
         } catch (error) {
             console.error('Error al enviar solicitud POST:', error);
@@ -95,6 +95,20 @@ function DhledsC() {
                     py-2 px-4 w-28"
                     value={num}
                     onChange={(e) => setNum(e.target.value)}></input>
+                    <button className=' flex text-white text-md items-center bg-[#592CD8] justify-center
+                    hover:bg-[#7048de] active:bg-violet-700 focus:outline-none
+                        focus:ring focus:ring-indigo-300 cursor-pointer px-7 py-1
+                        rounded-md'
+                        onClick={() => {
+                            const parsedNum = parseInt(num);
+                            if (!isNaN(parsedNum)) {
+                                sendPostRequestRojo(parsedNum);
+                            } else {
+                                alert("Please enter a valid number.");
+                            }
+                        }}>
+                        send
+                    </button>
                     </div>
                 </div>
             </div>

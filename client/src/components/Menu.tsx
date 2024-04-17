@@ -1,6 +1,6 @@
 
 
-function Menu() { 
+function Menu() {
     const Menus = [
         {title: "DHT11 DATA", link: "/"},
         {title: "DHT11 RECORD", link: "/dht11/record"},

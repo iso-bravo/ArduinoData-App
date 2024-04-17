@@ -1,22 +1,21 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
 
 function DhdataC() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
 
-  useEffect(() => {
-    const socket = io('http://localhost:3000');
-
-    socket.on('data', ({ temperature, humidity }) => {
-      setTemperature(temperature);
-      setHumidity(humidity);
+useEffect(() => {
+  axios.get('http://localhost:3000/dh_data/'
+  )
+    .then(response => {
+      setTemperature(response.data.temperature);
+      setHumidity(response.data.humidity);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
     });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+}, []);
 
     return (
       <div className=' px-20 py-14'>

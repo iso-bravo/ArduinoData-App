@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 app.use(cors());
+app.use(bodyParser.json())
 
 const PORT = process.env.PORT || 3000;
 
@@ -48,15 +49,20 @@ io.on('connection', (socket) => {
 // Save to database
 app.post('/dht11', async (req, res) => {
   const { humidity, temperature } = req.body;
+  console.log(req.body);
+  
+  // Emitir datos a través de WebSocket
+  io.emit('data', { temperature, humidity });
+
+  let client;
   
   try {
-      const client = await pool.connect();
+      client = await pool.connect();
       const currentDateTime = new Date().toISOString();
-      
-      const save = await client.query('INSERT INTO dh_record (fechahora, temperatura, humedad) VALUES ($1, $2, $3)', [currentDateTime, temperature, humidity]);
-      
       console.log("Humedad:", humidity);
       console.log("Temperatura:", temperature);
+      
+      const save = await client.query('INSERT INTO dh_records (fechahora, temperatura, humedad) VALUES ($1, $2, $3)', [currentDateTime, temperature, humidity]);
       
       res.sendStatus(200);
   } catch (error) {
@@ -67,7 +73,23 @@ app.post('/dht11', async (req, res) => {
   }
 });
 
+
   // Vistas
+
+  // GET data
+  app.get('/dh_data/', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      const result = await client.query('SELECT * FROM dh_records ORDER BY fechahora DESC LIMIT 1;');
+      const data = result.rows;
+      client.release();
+      res.json(data);
+      console.log(data);
+    } catch (err) {
+      console.error('Error en la consulta:', err);
+      res.status(500).send('Error en el servidor');
+    }
+  });
 
   // Record
   app.get('/dh_record/', async (req, res) => {
@@ -136,7 +158,6 @@ app.post('/bmp180', async (req, res) => {
       console.error('Error al insertar el registro en la base de datos:', error);
       res.status(500).send('Error interno del servidor');
   } finally {
-      client.release();
   }
 });
 
